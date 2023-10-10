@@ -17,4 +17,11 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
 			.ToList();
 	}
 
+	public Company GetCompany(int id, bool trackChanges)
+	{
+		var company = FindByCondition(c => c.Id == id, trackChanges)
+			.SingleOrDefault();
+
+		return company;
+	}
 }

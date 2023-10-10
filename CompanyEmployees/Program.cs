@@ -1,8 +1,5 @@
-	using Contracts;
-using LoggerService;
+using Contracts;
 using NLog;
-using Service.Contracts;
-using Services;
 
 namespace CompanyEmployees;
 
@@ -16,15 +13,15 @@ public class Program
 
 		builder.Services.ConfigureCors();
 		builder.Services.ConfigureIISIntegration();
-
-		builder.Services
-			.AddControllers()
-			.AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
-
 		builder.Services.ConfigureLoggerService();
 		builder.Services.ConfigureRepositoryManager();
 		builder.Services.ConfigureServiceManager();
+		builder.Services.AddAutoMapper(typeof(Program));
 		builder.Services.ConfigureSqlContext(builder.Configuration);
+
+		builder.Services
+			.AddControllers()
+			.AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
 		
 		LogManager.Setup(builder =>
 			builder.LoadConfigurationFromFile($@"{Directory.GetCurrentDirectory()}\nlog.config"));
@@ -44,7 +41,6 @@ public class Program
 		// If we don’t set a path to the static files directory
 		// It will use a wwwroot folder in our project by default.
 		app.UseStaticFiles();
-
 
 		// We will help us in deployment
 		app.UseForwardedHeaders(new ForwardedHeadersOptions

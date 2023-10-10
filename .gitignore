@@ -16,6 +16,9 @@
 # Mono auto generated files
 mono_crash.*
 
+
+CompanyEmployees/internal_logs/*
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

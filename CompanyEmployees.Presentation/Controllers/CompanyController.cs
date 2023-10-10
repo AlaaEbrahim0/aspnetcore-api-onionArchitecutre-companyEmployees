@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 
@@ -24,16 +18,15 @@ public class CompanyController: ControllerBase
     [HttpGet]
 	public IActionResult GetCompanies()
 	{
-		try
-		{
-			var companies = serviceManager.CompanyService.GetAllCompanies(false);
-			return Ok(companies);
+		var companies = serviceManager.CompanyService.GetAllCompanies(false);
+		return Ok(companies);		
+	}
 
-		}
-		catch (Exception ex)
-		{
-			return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-		}
+	[HttpGet("{id:int}")]
+	public IActionResult GetCompany(int id)
+	{
+		var company = serviceManager.CompanyService.GetCompany(id, false);
+		return Ok(company);
 	}
 
 }
