@@ -5,3 +5,11 @@ public class CompanyNotFoundException : NotFoundException
 		: base($"The company with id: {companyId} doesn't exist") 
 	{ }
 }
+
+
+public class EmployeeNotFoundException : NotFoundException
+{
+	public EmployeeNotFoundException(int employeeId)
+		: base($"Employee with id: {employeeId} doesn't exist")
+	{ }
+}
