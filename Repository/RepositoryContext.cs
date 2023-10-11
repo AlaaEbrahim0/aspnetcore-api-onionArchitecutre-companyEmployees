@@ -14,6 +14,13 @@ public class RepositoryContext: DbContext
 	{
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+
+        modelBuilder.Entity<Company>()
+            .HasMany(c => c.Employees)
+            .WithOne(c => c.Company)
+            .HasForeignKey(c => c.CompanyId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
     }
     
 	public DbSet<Employee>? Employees { get; set; }

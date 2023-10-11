@@ -14,6 +14,17 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
 	{
 	}
 
+	public void CreateEmployeeForCompany(int companyId, Employee employee)
+	{
+		employee.CompanyId = companyId;
+		Create(employee);
+	}
+
+	public void DeleteEmployee(Employee employee)
+	{
+		Delete(employee);
+	}
+
 	public Employee GetEmployee(int companyId, int employeeId, bool trackChanges)
 	{
 		var employee = FindByCondition(e => e.Id == employeeId && e.CompanyId == companyId, trackChanges)

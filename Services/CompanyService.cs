@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Reflection.Metadata;
+using AutoMapper;
 using Contracts;
 using Entities;
 using Entities.Exceptions;
@@ -19,10 +20,45 @@ public class CompanyService: ICompanyService
 		this.mapper = mapper;
 	}
 
+	public CompanyDto CreateCompany(CreateCompanyDto createCompanyDto)
+	{
+		var company = mapper.Map<Company>(createCompanyDto);
+
+		repository.Company.CreateCompany(company);
+		repository.Save();
+
+		var returnCompanyDto = mapper.Map<CompanyDto>(company);
+
+		return returnCompanyDto;	
+	}
+
+	public void DeleteCompany(int companyId, bool trackChanges)
+	{
+		var company = repository.Company.GetCompany(companyId, trackChanges	);
+		if (company is null)
+			throw new CompanyNotFoundException(companyId);
+
+		repository.Company.DeleteCompany(company);
+		repository.Save();
+	}
+
 	public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges)
 	{
 		var companies = repository.Company
 			.GetAllCompanies(trackChanges);
+
+		var companiesDto = mapper.Map<IEnumerable<CompanyDto>>(companies);
+		return companiesDto;
+	}
+
+	public IEnumerable<CompanyDto> GetByIds(IEnumerable<int> ids, bool trackChanges)
+	{
+		if (ids is null)
+			throw new IdParametersBadRequestException();
+
+		var companies = repository.Company.GetByIds(ids, trackChanges);
+		if (ids.Count() != companies.Count())
+			throw new CollectionByIdsBadRequestException();
 
 		var companiesDto = mapper.Map<IEnumerable<CompanyDto>>(companies);
 		return companiesDto;
@@ -38,5 +74,24 @@ public class CompanyService: ICompanyService
 		var companyDto = mapper.Map<CompanyDto>(company);
 
 		return companyDto;
+	}
+
+	(IEnumerable<CompanyDto> companies, string ids) ICompanyService.CreateCompanyCollection(IEnumerable<CreateCompanyDto> companyCollection)
+	{
+		if (companyCollection is null)
+			throw new CompanyCollectionBadRequest();
+
+		var companies = mapper.Map<IEnumerable<Company>>(companyCollection);
+		foreach (var company in companies)
+		{
+			repository.Company.CreateCompany(company);
+		}
+		repository.Save();
+
+		var companiesDto = mapper.Map<IEnumerable<CompanyDto>>(companies);
+		var ids = string.Join(',', companies.Select(x => x.Id));
+		
+		return (companiesDto, ids);
+
 	}
 }

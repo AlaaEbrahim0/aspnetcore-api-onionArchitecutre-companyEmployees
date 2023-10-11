@@ -2,6 +2,7 @@
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
 namespace Repository.Configurations;
 
@@ -23,5 +24,6 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
 		var data = companyFaker.Generate(20);
 		builder.HasData(data);
+		
 	}
 }

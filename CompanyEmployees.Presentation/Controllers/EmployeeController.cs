@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using Shared.DTOs;
 
 namespace CompanyEmployees.Presentation.Controllers;
 
@@ -27,5 +28,22 @@ public class EmployeeController : ControllerBase
 	{
 		var employee = serviceManager.EmployeeService.GetEmployee(companyId, employeeId, false);
 		return Ok(employee);
+	}
+
+	[HttpPost]
+	public IActionResult CreateEmployee(int companyId, CreateEmployeeDto employeeForCreation)
+	{
+		if (employeeForCreation is null)
+			return BadRequest("CreateEmployeeDto is null");
+
+		var employee = serviceManager.EmployeeService.CreateEmployeeForCompany(companyId, employeeForCreation, true);
+		return CreatedAtAction(nameof(GetEmployee), new { companyId, employeeId = employee.Id }, employee);
+	}
+
+	[HttpDelete("{employeeId:int}")]
+	public IActionResult DeleteEmployeeForCompany(int companyId, int employeeId)
+	{
+		serviceManager.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, false);
+		return Ok($"Employee with id: {employeeId} has been deleted successfully");
 	}
 }

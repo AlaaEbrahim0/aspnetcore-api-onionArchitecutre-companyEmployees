@@ -1,5 +1,4 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Entities;
 using Shared.DTOs;
 
@@ -10,10 +9,16 @@ public class MappingProfile: Profile
     public MappingProfile()
     {
         CreateMap<Company, CompanyDto>()
-            .ForCtorParam("FullAddress",
+            .ForMember(dest => dest.FullAddress,
             opt => opt.MapFrom(s => string.Join(' ', s.Address, s.Country)));
 
-
+        CreateMap<CreateCompanyDto, Company>()
+            .ForMember(dest => dest.Employees, src => src.MapFrom(opt => opt.Employees));
+            
         CreateMap<Employee, EmployeeDto>();
+
+        CreateMap<CreateEmployeeDto, Employee>();
+
+        
     }
 }

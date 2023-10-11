@@ -1,4 +1,6 @@
 using Contracts;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 
 namespace CompanyEmployees;
@@ -18,10 +20,12 @@ public class Program
 		builder.Services.ConfigureServiceManager();
 		builder.Services.AddAutoMapper(typeof(Program));
 		builder.Services.ConfigureSqlContext(builder.Configuration);
+		builder.Services.ConfigureControllersAndFormatters();
 
-		builder.Services
-			.AddControllers()
-			.AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
+		builder.Services.Configure<ApiBehaviorOptions>(options =>
+		{
+			options.SuppressModelStateInvalidFilter = true;
+		});
 		
 		LogManager.Setup(builder =>
 			builder.LoadConfigurationFromFile($@"{Directory.GetCurrentDirectory()}\nlog.config"));

@@ -5,6 +5,7 @@ using NLog;
 using Repository;
 using Service.Contracts;
 using Services;
+using Shared.DTOs;
 
 namespace CompanyEmployees.Extensions;
 
@@ -51,6 +52,24 @@ public static class ServiceExtensions
 		{
 			options.UseSqlServer(configuration.GetConnectionString("sqlConnection"));
 		});
+	}
+
+	public static void ConfigureControllersAndFormatters(this IServiceCollection services)
+	{
+		services
+		.AddControllers(config =>
+		{
+			// Respect the HTTP [Accept] Header 
+			config.RespectBrowserAcceptHeader = true;
+
+			// tells the server that if the client tries to negotiate
+			// for a media type the server doesn’t support, 
+			// it should return the 406 Not Acceptable status code.
+			config.ReturnHttpNotAcceptable = true;
+		})
+		.AddCustomCSVFormatter<CompanyDto>()
+		.AddXmlDataContractSerializerFormatters()
+		.AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
 	}
 
 }
