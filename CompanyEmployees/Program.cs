@@ -1,6 +1,8 @@
 using Contracts;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
 using NLog;
 
 namespace CompanyEmployees;
@@ -33,6 +35,7 @@ public class Program
 		var app = builder.Build();
 
 		var logger = app.Services.GetRequiredService<ILoggerManager>();
+
 		app.ConfigureExceptionHandler(logger);
 
 		if (app.Environment.IsProduction()) 
@@ -45,8 +48,7 @@ public class Program
 		// If we don’t set a path to the static files directory
 		// It will use a wwwroot folder in our project by default.
 		app.UseStaticFiles();
-
-		// We will help us in deployment
+		// will help us in deployment
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
 		{
 			ForwardedHeaders = ForwardedHeaders.All

@@ -20,9 +20,9 @@ public class CompanyService: ICompanyService
 		this.mapper = mapper;
 	}
 
-	public CompanyDto CreateCompany(CreateCompanyDto createCompanyDto)
+	public CompanyDto CreateCompany(CompanyForCreationDto CompanyForCreationDto)
 	{
-		var company = mapper.Map<Company>(createCompanyDto);
+		var company = mapper.Map<Company>(CompanyForCreationDto);
 
 		repository.Company.CreateCompany(company);
 		repository.Save();
@@ -76,7 +76,34 @@ public class CompanyService: ICompanyService
 		return companyDto;
 	}
 
-	(IEnumerable<CompanyDto> companies, string ids) ICompanyService.CreateCompanyCollection(IEnumerable<CreateCompanyDto> companyCollection)
+	public (CompanyForUpdationDto, Company) GetCompanyForPatch(int companyId, bool trackChanges)
+	{
+		var company = repository.Company.GetCompany(companyId, trackChanges);
+
+		if (company is null)
+			throw new CompanyNotFoundException(companyId);
+
+		var companyForPatch = mapper.Map<CompanyForUpdationDto>(company);
+		return (companyForPatch, company);
+	}
+
+	public void SaveChangesForPatch(CompanyForUpdationDto updationDto, Company companyEntity)
+	{
+		mapper.Map(updationDto, companyEntity);
+		repository.Save();
+	}
+
+	public void UpdateCompany(int companyId, CompanyForUpdationDto companyForUpdate, bool trackChanges)
+	{
+		var company = repository.Company.GetCompany(companyId, trackChanges);
+		if (company is null)
+			throw new CompanyNotFoundException(companyId);
+
+		mapper.Map(company, companyForUpdate);
+		repository.Save();
+	}
+
+	(IEnumerable<CompanyDto> companies, string ids) ICompanyService.CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyCollection)
 	{
 		if (companyCollection is null)
 			throw new CompanyCollectionBadRequest();

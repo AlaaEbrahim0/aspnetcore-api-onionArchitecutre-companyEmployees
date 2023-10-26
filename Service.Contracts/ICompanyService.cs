@@ -1,16 +1,24 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.SymbolStore;
+using Entities;
 using Shared.DTOs;
 
 namespace Service.Contracts;
 public interface ICompanyService
 {
-	IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges);
 	CompanyDto GetCompany(int companyId, bool trackChanges);
-	CompanyDto CreateCompany(CreateCompanyDto companyDto);
+	CompanyDto CreateCompany(CompanyForCreationDto companyDto);
+
+	void DeleteCompany(int companyId, bool trackChanges);
+	void UpdateCompany(int companyId, CompanyForUpdationDto companyForUpdate, bool trackChanges);
+
+	IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges);
 	IEnumerable<CompanyDto> GetByIds(IEnumerable<int> ids, bool trackChanges);
 	(IEnumerable<CompanyDto> companies, string ids)
-		CreateCompanyCollection(IEnumerable<CreateCompanyDto> companyCollection);
-	void DeleteCompany(int companyId, bool trackChanges);
+		CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyCollection);
+
+	(CompanyForUpdationDto companyForPatch, Company companyEntity) GetCompanyForPatch(int companyId, bool trackChanges);
+	void SaveChangesForPatch(CompanyForUpdationDto updationDto, Company companyEntity);
+
 }
 

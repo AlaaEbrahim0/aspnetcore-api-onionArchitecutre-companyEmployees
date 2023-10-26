@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DTOs;
@@ -38,18 +39,25 @@ public class CompanyController: ControllerBase
 	}
 
 	[HttpPost]
-	public IActionResult CreateCompany([FromBody] CreateCompanyDto companyDto)
+	public IActionResult CreateCompany([FromBody] CompanyForCreationDto companyDto)
 	{
 		if (companyDto is null)
-			return BadRequest("CreateCompanyDto is null");
+			return BadRequest("CompanyForCreationDto is null");
+
+		if (!ModelState.IsValid)
+			return UnprocessableEntity(ModelState);
 
 		var company = serviceManager.CompanyService.CreateCompany(companyDto);
 
 		return CreatedAtAction(nameof(GetCompany), new { id = company.Id }, company);
 	}
+
 	[HttpPost("collection")]
-	public IActionResult CreateCompanyCollection(IEnumerable<CreateCompanyDto> companies)
+	public IActionResult CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companies)
 	{
+		if (!ModelState.IsValid)
+			return UnprocessableEntity(ModelState);
+
 		var result = serviceManager.CompanyService.CreateCompanyCollection(companies);
 		return CreatedAtAction(nameof(GetCompanyCollection), new { ids = result.ids }, result.companies);
 	}
@@ -60,4 +68,38 @@ public class CompanyController: ControllerBase
 		serviceManager.CompanyService.DeleteCompany(companyId, false);
 		return Ok($"Company with Id: {companyId} has been deleted successfully");
 	}
+
+	[HttpPut("{companyId:int}")]
+	public IActionResult UpdateCompany(int companyId, CompanyForUpdationDto companyToUpdate)
+	{
+		if (companyToUpdate is null)
+			return BadRequest("CompanyForUpdationDto is null");
+
+		if (!ModelState.IsValid)
+			return UnprocessableEntity(ModelState);
+
+		serviceManager.CompanyService.UpdateCompany(companyId, companyToUpdate, true);
+		return Ok($"Company with Id: {companyId} has been updated successfully");
+	}
+
+	[HttpPatch("{companyId:int}")]
+	public IActionResult PartiallyUpdateCompany(int companyId, JsonPatchDocument<CompanyForUpdationDto> patchDocument)
+	{
+		if (patchDocument is null)
+			return BadRequest("CompanyForUpdation Dto is null");
+
+		var result = serviceManager.CompanyService.GetCompanyForPatch(companyId, true);
+
+		patchDocument.ApplyTo(result.companyForPatch, ModelState);
+
+		TryValidateModel(ModelState);
+
+		if (!ModelState.IsValid)
+			return UnprocessableEntity(ModelState);
+
+		serviceManager.CompanyService.SaveChangesForPatch(result.companyForPatch, result.companyEntity);
+		return NoContent();
+
+	}
+
 }

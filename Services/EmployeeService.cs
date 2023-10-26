@@ -21,7 +21,7 @@ public class EmployeeService : IEmployeeService
 		this.mapper = mapper;
 	}
 
-	public EmployeeDto CreateEmployeeForCompany(int companyId, CreateEmployeeDto employeeForCreation, bool trackChanges)
+	public EmployeeDto CreateEmployeeForCompany(int companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
 	{
 		if (!companyExist(companyId, trackChanges))
 			throw new CompanyNotFoundException(companyId);
@@ -79,6 +79,39 @@ public class EmployeeService : IEmployeeService
 
 		repository.Employee.DeleteEmployee(employee);
 		repository.Save();
+	}
 
+	public void UpdateEmployeeForCompany(int companyId, int employeeId, EmployeeForUpdationDto employeeForUpdate, bool compTrackChanges, bool empTrackChanges)
+	{
+		if (!companyExist(companyId, compTrackChanges))
+			throw new CompanyNotFoundException(companyId);
+
+		var employee = repository.Employee.GetEmployee(companyId, employeeId, empTrackChanges);
+		if (employee is null)
+			throw new EmployeeNotFoundException(employeeId);
+
+		mapper.Map(employeeForUpdate, employee);
+		repository.Save();
+	}
+
+	public (EmployeeForUpdationDto employeeToPatch, Employee employeeEntity)
+		GetEmployeeForPatch(int companyId, int id, bool compTrackChanges, bool empTrackChanges)
+	{
+		if (!companyExist(companyId, compTrackChanges))
+			throw new CompanyNotFoundException(companyId);
+
+		var employee = repository.Employee.GetEmployee(companyId, id, empTrackChanges);
+		if (employee is null)
+			throw new EmployeeNotFoundException(id);
+
+		var employeeToPatch = mapper.Map<EmployeeForUpdationDto>(employee);
+		return (employeeToPatch, employee);
+
+	}
+
+	public void SaveChangesForPatch(EmployeeForUpdationDto employeeToPatch, Employee employeeEntity)
+	{
+		mapper.Map(employeeToPatch, employeeEntity);
+		repository.Save();
 	}
 }

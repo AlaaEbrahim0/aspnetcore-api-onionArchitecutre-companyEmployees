@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DTOs;
@@ -31,10 +31,15 @@ public class EmployeeController : ControllerBase
 	}
 
 	[HttpPost]
-	public IActionResult CreateEmployee(int companyId, CreateEmployeeDto employeeForCreation)
+	public IActionResult CreateEmployee(int companyId, EmployeeForCreationDto employeeForCreation)
 	{
 		if (employeeForCreation is null)
-			return BadRequest("CreateEmployeeDto is null");
+			return BadRequest("EmployeeForCreationDto is null");
+		
+		if (!ModelState.IsValid)
+		{
+			return UnprocessableEntity(ModelState);
+		}
 
 		var employee = serviceManager.EmployeeService.CreateEmployeeForCompany(companyId, employeeForCreation, true);
 		return CreatedAtAction(nameof(GetEmployee), new { companyId, employeeId = employee.Id }, employee);
@@ -45,5 +50,40 @@ public class EmployeeController : ControllerBase
 	{
 		serviceManager.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, false);
 		return Ok($"Employee with id: {employeeId} has been deleted successfully");
+	}
+
+	[HttpPut("{employeeId:int}")]
+	public IActionResult UpdateEmployeeForCompany(int companyId, int employeeId, EmployeeForUpdationDto employeeForUpdate)
+	{	
+		if (employeeForUpdate is null)
+			return BadRequest("EmployeeForUpdationDto is null");
+
+		if (!ModelState.IsValid)
+			return UnprocessableEntity(ModelState);
+
+		serviceManager.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employeeForUpdate, false, true);
+		return Ok($"Employee with ID: {employeeId} has been updated successfully");
+	}
+
+	[HttpPatch("{employeeId:int}")]
+	public IActionResult PartiallyUpdateEmployeeForCompany
+		(int companyId, int employeeId, [FromBody] JsonPatchDocument<EmployeeForUpdationDto> patchDocument)
+	{
+		if (patchDocument is null)
+			return BadRequest("Employee Patch Document is null");
+
+		var result = serviceManager.EmployeeService
+			.GetEmployeeForPatch(companyId, employeeId, false, true);
+
+		patchDocument.ApplyTo(result.employeeToPatch, ModelState);
+
+		TryValidateModel(result.employeeToPatch);
+
+		if (!ModelState.IsValid)
+			return UnprocessableEntity(ModelState);
+		
+		serviceManager.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
+
+		return NoContent();
 	}
 }

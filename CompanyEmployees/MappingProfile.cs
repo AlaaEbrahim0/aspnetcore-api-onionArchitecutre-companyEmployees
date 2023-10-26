@@ -12,13 +12,19 @@ public class MappingProfile: Profile
             .ForMember(dest => dest.FullAddress,
             opt => opt.MapFrom(s => string.Join(' ', s.Address, s.Country)));
 
-        CreateMap<CreateCompanyDto, Company>()
+        CreateMap<CompanyForCreationDto, Company>()
             .ForMember(dest => dest.Employees, src => src.MapFrom(opt => opt.Employees));
             
         CreateMap<Employee, EmployeeDto>();
 
-        CreateMap<CreateEmployeeDto, Employee>();
+        CreateMap<EmployeeForUpdationDto, Employee>();
+        CreateMap<EmployeeForUpdationDto, Employee>().ReverseMap();
+		CreateMap<EmployeeForCreationDto, Employee>();
 
-        
-    }
+        CreateMap<CompanyForUpdationDto, Company>();
+        CreateMap<CompanyForUpdationDto, Company>().ReverseMap();
+
+
+
+	}
 }

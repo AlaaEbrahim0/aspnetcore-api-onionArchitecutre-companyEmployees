@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Mime;
 using CompanyEmployees.CustomFormatters;
 using Contracts;
 using Entities.ErrorModel;
@@ -19,34 +20,34 @@ public static class ExceptionMiddlewareExtensions
 		return builder;
 	}
 
-	public static void ConfigureExceptionHandler(this WebApplication app, 
-		ILoggerManager logger)
+	public static void ConfigureExceptionHandler(this WebApplication app, ILoggerManager logger)
 	{
-		app.UseExceptionHandler(error =>
+		app.UseExceptionHandler(options =>
 		{
-			error.Run(async context =>
+			options.Run(async context =>
 			{
 				context.Response.ContentType = "application/json";
 
-				var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-				if (contextFeature != null)
+				var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+				if (exceptionHandlerFeature != null)
 				{
-					context.Response.StatusCode = contextFeature.Error
+					context.Response.StatusCode = exceptionHandlerFeature.Error
 					switch
 					{
 						NotFoundException => StatusCodes.Status404NotFound,
 						BadRequestException => StatusCodes.Status400BadRequest,
 						_ => StatusCodes.Status500InternalServerError
 					};
-					logger.LogError($"Something went wrong: {contextFeature.Error}");
+
+					logger.LogError($"Something went wrong: {exceptionHandlerFeature.Error}");
 
 					await context.Response.WriteAsync(new ErrorDetails
 					{
 						StatusCode = context.Response.StatusCode,
-						Message = contextFeature.Error.Message
-					}.ToString());
-
-				};
+						Message = exceptionHandlerFeature.Error.Message
+					}
+					.ToString());
+				}
 			});
 		});
 	}

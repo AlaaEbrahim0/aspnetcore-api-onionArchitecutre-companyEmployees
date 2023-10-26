@@ -1,6 +1,10 @@
 ﻿using Contracts;
 using LoggerService;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Options;
 using NLog;
 using Repository;
 using Service.Contracts;
@@ -66,10 +70,26 @@ public static class ServiceExtensions
 			// for a media type the server doesn’t support, 
 			// it should return the 406 Not Acceptable status code.
 			config.ReturnHttpNotAcceptable = true;
+
+			config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
 		})
 		.AddCustomCSVFormatter<CompanyDto>()
 		.AddXmlDataContractSerializerFormatters()
 		.AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
+	}
+
+	private static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
+	{
+		return
+			new ServiceCollection()
+			.AddLogging()
+			.AddMvc()
+			.AddNewtonsoftJson()
+			.Services
+			.BuildServiceProvider()
+			.GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
+			.OfType<NewtonsoftJsonPatchInputFormatter>()
+			.First();
 	}
 
 }
