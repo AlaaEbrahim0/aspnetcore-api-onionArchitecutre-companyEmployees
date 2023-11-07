@@ -22,5 +22,5 @@ public class RepositoryManager : IRepositoryManager
 	public IEmployeeRepository Employee => employeeRepository.Value;
 	public ICompanyRepository Company => companyRepository.Value;
 
-	public void Save() => repositoryContext.SaveChanges();
+	public async Task SaveAsync() => await repositoryContext.SaveChangesAsync();
 }

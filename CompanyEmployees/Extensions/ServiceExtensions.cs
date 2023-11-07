@@ -1,11 +1,8 @@
 ﻿using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Options;
-using NLog;
 using Repository;
 using Service.Contracts;
 using Services;
@@ -54,7 +51,10 @@ public static class ServiceExtensions
 	{
 		services.AddDbContextPool<RepositoryContext>(options =>
 		{
-			options.UseSqlServer(configuration.GetConnectionString("sqlConnection"));
+			options.UseSqlServer(configuration.GetConnectionString("sqlConnection"), b =>
+			{
+				b.MigrationsAssembly(nameof(Repository));
+			});
 		});
 	}
 
@@ -72,6 +72,8 @@ public static class ServiceExtensions
 			config.ReturnHttpNotAcceptable = true;
 
 			config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+			
+				
 		})
 		.AddCustomCSVFormatter<CompanyDto>()
 		.AddXmlDataContractSerializerFormatters()

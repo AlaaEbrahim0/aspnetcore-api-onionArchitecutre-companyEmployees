@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CompanyEmployees.Presentation.ActionFilters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -18,77 +19,74 @@ public class CompanyController: ControllerBase
 	}
 
     [HttpGet]
-	public IActionResult GetCompanies()
+	public async Task<IActionResult> GetCompaniesAsync()
 	{
-		var companies = serviceManager.CompanyService.GetAllCompanies(false);
+		var companies = await serviceManager.CompanyService.GetAllCompaniesAsync(false);
 		return Ok(companies);		
 	}
 
 	[HttpGet("collection/{ids}")]
-	public IActionResult GetCompanyCollection(IEnumerable<int> ids)
+	public async Task<IActionResult> GetCompanyCollectionAsync(IEnumerable<int> ids)
 	{
-		var companies = serviceManager.CompanyService.GetByIds(ids, false);
+		var companies = await serviceManager.CompanyService.GetByIdsAsync(ids, false);
 		return Ok(companies);
 	}
 
 	[HttpGet("{id:int}", Name = "CompanyById")]
-	public IActionResult GetCompany(int id)
+	public async Task<IActionResult> GetCompanyAsync(int id)
 	{
-		var company = serviceManager.CompanyService.GetCompany(id, false);
+		var company = await serviceManager.CompanyService.GetCompanyAsync(id, false);
 		return Ok(company);
 	}
 
 	[HttpPost]
-	public IActionResult CreateCompany([FromBody] CompanyForCreationDto companyDto)
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	public async Task<IActionResult> CreateCompanyAsync([FromBody] CompanyForCreationDto companyDto)
 	{
-		if (companyDto is null)
-			return BadRequest("CompanyForCreationDto is null");
-
-		if (!ModelState.IsValid)
-			return UnprocessableEntity(ModelState);
-
-		var company = serviceManager.CompanyService.CreateCompany(companyDto);
-
-		return CreatedAtAction(nameof(GetCompany), new { id = company.Id }, company);
+		var company = await serviceManager.CompanyService.CreateCompanyAsync(companyDto);
+		return CreatedAtRoute("CompanyById", new { id = company.Id }, company);
 	}
 
 	[HttpPost("collection")]
-	public IActionResult CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companies)
+	public async Task<IActionResult> CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companies)
 	{
 		if (!ModelState.IsValid)
 			return UnprocessableEntity(ModelState);
 
-		var result = serviceManager.CompanyService.CreateCompanyCollection(companies);
-		return CreatedAtAction(nameof(GetCompanyCollection), new { ids = result.ids }, result.companies);
+		var result = await serviceManager.CompanyService.CreateCompanyCollectionAsync(companies);
+		return CreatedAtAction(nameof(GetCompanyCollectionAsync), new { ids = result.ids }, result.companies);
 	}
 
 	[HttpDelete("{companyId:int}")]
-	public IActionResult DeleteCompany(int companyId)
+	public async Task<IActionResult> DeleteCompanyAsync(int companyId)
 	{
-		serviceManager.CompanyService.DeleteCompany(companyId, false);
+		await serviceManager.CompanyService.DeleteCompanyAsync(companyId, false);
 		return Ok($"Company with Id: {companyId} has been deleted successfully");
 	}
 
 	[HttpPut("{companyId:int}")]
-	public IActionResult UpdateCompany(int companyId, CompanyForUpdationDto companyToUpdate)
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	public async Task<IActionResult> UpdateCompanyAsync(int companyId, CompanyForUpdationDto companyToUpdate)
 	{
-		if (companyToUpdate is null)
-			return BadRequest("CompanyForUpdationDto is null");
+		// The validationFilter is a substitue for the below commented code
 
-		if (!ModelState.IsValid)
-			return UnprocessableEntity(ModelState);
+		//if (companyToUpdate is null)
+		//	return BadRequest("CompanyForUpdationDto is null");
 
-		serviceManager.CompanyService.UpdateCompany(companyId, companyToUpdate, true);
+		//if (!ModelState.IsValid)
+		//	return UnprocessableEntity(ModelState);
+
+		await serviceManager.CompanyService.UpdateCompanyAsync(companyId, companyToUpdate, true);
 		return Ok($"Company with Id: {companyId} has been updated successfully");
 	}
 
 	[HttpPatch("{companyId:int}")]
-	public IActionResult PartiallyUpdateCompany(int companyId, JsonPatchDocument<CompanyForUpdationDto> patchDocument)
+	public async Task<IActionResult> PartiallyUpdateCompanyAsync(int companyId, JsonPatchDocument<CompanyForUpdationDto> patchDocument)
 	{
 		if (patchDocument is null)
 			return BadRequest("CompanyForUpdation Dto is null");
 
-		var result = serviceManager.CompanyService.GetCompanyForPatch(companyId, true);
+		var result = await serviceManager.CompanyService.GetCompanyForPatchAsync(companyId, true);
 
 		patchDocument.ApplyTo(result.companyForPatch, ModelState);
 
@@ -97,7 +95,7 @@ public class CompanyController: ControllerBase
 		if (!ModelState.IsValid)
 			return UnprocessableEntity(ModelState);
 
-		serviceManager.CompanyService.SaveChangesForPatch(result.companyForPatch, result.companyEntity);
+		await serviceManager.CompanyService.SaveChangesForPatchAsync(result.companyForPatch, result.companyEntity);
 		return NoContent();
 
 	}

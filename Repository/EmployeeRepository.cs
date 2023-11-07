@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Contracts;
 using Entities;
 using Entities.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository;
 public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
@@ -25,19 +26,19 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
 		Delete(employee);
 	}
 
-	public Employee GetEmployee(int companyId, int employeeId, bool trackChanges)
+	public async Task<Employee?> GetEmployeeAsync(int companyId, int employeeId, bool trackChanges)
 	{
-		var employee = FindByCondition(e => e.Id == employeeId && e.CompanyId == companyId, trackChanges)
-			.SingleOrDefault();
+		var employee = await FindByCondition(e => e.Id == employeeId && e.CompanyId == companyId, trackChanges)
+			.SingleOrDefaultAsync();
 
 		return employee;
 	}
 
-	public IEnumerable<Employee> GetEmployees(int companyId, bool trackChanges)
+	public async Task<IEnumerable<Employee>> GetEmployeesAsync(int companyId, bool trackChanges)
 	{
-		var employees = FindByCondition(e => e.CompanyId == companyId, trackChanges)
+		var employees = await FindByCondition(e => e.CompanyId == companyId, trackChanges)
 			.OrderBy(e => e.Name)
-			.ToList();
+			.ToListAsync();
 
 		return employees;
 

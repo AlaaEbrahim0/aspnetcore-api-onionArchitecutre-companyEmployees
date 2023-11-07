@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using CompanyEmployees.Presentation.ActionFilters;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DTOs;
@@ -17,63 +18,51 @@ public class EmployeeController : ControllerBase
 	}
 
 	[HttpGet]
-	public IActionResult GetEmployees(int companyId)
+	public async Task<IActionResult> GetEmployeesAsync(int companyId)
 	{
-		var employees = serviceManager.EmployeeService.GetEmployees(companyId, false);
+		var employees = await serviceManager.EmployeeService.GetEmployeesAsync(companyId, false);
 		return Ok(employees);
 	}
 
 	[HttpGet("{employeeId:int}")]
-	public IActionResult GetEmployee(int companyId, int employeeId)
+	public async Task<IActionResult> GetEmployee(int companyId, int employeeId)
 	{
-		var employee = serviceManager.EmployeeService.GetEmployee(companyId, employeeId, false);
+		EmployeeDto employee = await serviceManager.EmployeeService.GetEmployeeAsync(companyId, employeeId, false);
 		return Ok(employee);
 	}
 
 	[HttpPost]
-	public IActionResult CreateEmployee(int companyId, EmployeeForCreationDto employeeForCreation)
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	public async Task<IActionResult> CreateEmployeeAsync(int companyId, EmployeeForCreationDto employeeForCreation)
 	{
-		if (employeeForCreation is null)
-			return BadRequest("EmployeeForCreationDto is null");
-		
-		if (!ModelState.IsValid)
-		{
-			return UnprocessableEntity(ModelState);
-		}
-
-		var employee = serviceManager.EmployeeService.CreateEmployeeForCompany(companyId, employeeForCreation, true);
+		var employee = await serviceManager.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employeeForCreation, true);
 		return CreatedAtAction(nameof(GetEmployee), new { companyId, employeeId = employee.Id }, employee);
 	}
 
 	[HttpDelete("{employeeId:int}")]
-	public IActionResult DeleteEmployeeForCompany(int companyId, int employeeId)
+	public async Task<IActionResult> DeleteEmployeeForCompanyAsync(int companyId, int employeeId)
 	{
-		serviceManager.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, false);
+		await serviceManager.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, employeeId, false);
 		return Ok($"Employee with id: {employeeId} has been deleted successfully");
 	}
 
 	[HttpPut("{employeeId:int}")]
-	public IActionResult UpdateEmployeeForCompany(int companyId, int employeeId, EmployeeForUpdationDto employeeForUpdate)
+	[ServiceFilter(typeof(ValidationFilterAttribute))]
+	public async Task<IActionResult> UpdateEmployeeForCompanyAsync(int companyId, int employeeId, EmployeeForUpdationDto employeeForUpdate)
 	{	
-		if (employeeForUpdate is null)
-			return BadRequest("EmployeeForUpdationDto is null");
-
-		if (!ModelState.IsValid)
-			return UnprocessableEntity(ModelState);
-
-		serviceManager.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employeeForUpdate, false, true);
+		await serviceManager.EmployeeService.UpdateEmployeeForCompanyAsync(companyId, employeeId, employeeForUpdate, false, true);
 		return Ok($"Employee with ID: {employeeId} has been updated successfully");
 	}
 
 	[HttpPatch("{employeeId:int}")]
-	public IActionResult PartiallyUpdateEmployeeForCompany
+	public async Task<IActionResult> PartiallyUpdateEmployeeForCompanyAsync
 		(int companyId, int employeeId, [FromBody] JsonPatchDocument<EmployeeForUpdationDto> patchDocument)
 	{
 		if (patchDocument is null)
 			return BadRequest("Employee Patch Document is null");
 
-		var result = serviceManager.EmployeeService
-			.GetEmployeeForPatch(companyId, employeeId, false, true);
+		var result = await serviceManager.EmployeeService
+			.GetEmployeeForPatchAsync(companyId, employeeId, false, true);
 
 		patchDocument.ApplyTo(result.employeeToPatch, ModelState);
 
@@ -82,7 +71,7 @@ public class EmployeeController : ControllerBase
 		if (!ModelState.IsValid)
 			return UnprocessableEntity(ModelState);
 		
-		serviceManager.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
+		await serviceManager.EmployeeService.SaveChangesForPatchAsync(result.employeeToPatch, result.employeeEntity);
 
 		return NoContent();
 	}

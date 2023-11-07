@@ -1,10 +1,6 @@
+using CompanyEmployees.Presentation.ActionFilters;
 using Contracts;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Extensions.Options;
 using NLog;
-
 namespace CompanyEmployees;
 
 public class Program
@@ -23,6 +19,7 @@ public class Program
 		builder.Services.AddAutoMapper(typeof(Program));
 		builder.Services.ConfigureSqlContext(builder.Configuration);
 		builder.Services.ConfigureControllersAndFormatters();
+		builder.Services.AddScoped<ValidationFilterAttribute>();
 
 		builder.Services.Configure<ApiBehaviorOptions>(options =>
 		{
@@ -48,6 +45,7 @@ public class Program
 		// If we don’t set a path to the static files directory
 		// It will use a wwwroot folder in our project by default.
 		app.UseStaticFiles();
+		
 		// will help us in deployment
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
 		{

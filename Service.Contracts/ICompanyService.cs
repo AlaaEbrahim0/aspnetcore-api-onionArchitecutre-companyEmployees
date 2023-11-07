@@ -6,19 +6,19 @@ using Shared.DTOs;
 namespace Service.Contracts;
 public interface ICompanyService
 {
-	CompanyDto GetCompany(int companyId, bool trackChanges);
-	CompanyDto CreateCompany(CompanyForCreationDto companyDto);
+	Task<CompanyDto?> GetCompanyAsync(int companyId, bool trackChanges);
+	Task<CompanyDto?> CreateCompanyAsync(CompanyForCreationDto companyDto);
 
-	void DeleteCompany(int companyId, bool trackChanges);
-	void UpdateCompany(int companyId, CompanyForUpdationDto companyForUpdate, bool trackChanges);
+	Task DeleteCompanyAsync(int companyId, bool trackChanges);
+	Task UpdateCompanyAsync(int companyId, CompanyForUpdationDto companyForUpdate, bool trackChanges);
 
-	IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges);
-	IEnumerable<CompanyDto> GetByIds(IEnumerable<int> ids, bool trackChanges);
-	(IEnumerable<CompanyDto> companies, string ids)
-		CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyCollection);
+	Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges);
+	Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<int> ids, bool trackChanges);
+	Task<(IEnumerable<CompanyDto> companies, string ids)>
+		CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection);
 
-	(CompanyForUpdationDto companyForPatch, Company companyEntity) GetCompanyForPatch(int companyId, bool trackChanges);
-	void SaveChangesForPatch(CompanyForUpdationDto updationDto, Company companyEntity);
+	Task<(CompanyForUpdationDto companyForPatch, Company companyEntity)> GetCompanyForPatchAsync(int companyId, bool trackChanges);
+	Task SaveChangesForPatchAsync(CompanyForUpdationDto updationDto, Company companyEntity);
 
 }
 

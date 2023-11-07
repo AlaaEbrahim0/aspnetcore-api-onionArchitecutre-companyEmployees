@@ -8,9 +8,9 @@ using Entities;
 namespace Contracts;
 public interface ICompanyRepository
 {
-	IEnumerable<Company> GetByIds(IEnumerable<int> ids, bool trackChanges);
-	IEnumerable<Company> GetAllCompanies(bool trackChanges); 
-	Company GetCompany (int id, bool trackChanges);
+	Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<int> ids, bool trackChanges);
+	Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges); 
+	Task<Company?> GetCompanyAsync (int id, bool trackChanges);
 	void CreateCompany (Company company);
 	void DeleteCompany(Company company);
 }

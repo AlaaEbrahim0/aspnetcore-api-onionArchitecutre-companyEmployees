@@ -19,6 +19,7 @@ public abstract record CompanyForCreationOrUpdation
 	[Required(ErrorMessage = "Country is required")]
 	[MaxLength(56)]
 	public string? Country { get; init; }
+
 	public IEnumerable<EmployeeForCreationDto>? Employees { get; init; }
 }
 

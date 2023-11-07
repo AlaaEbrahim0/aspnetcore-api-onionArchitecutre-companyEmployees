@@ -19,7 +19,7 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
 	}
 
 	public void Create(T entity)
-		=> RepositoryContext.Set<T>().Add(entity);
+		=> RepositoryContext.Set<T>().AddAsync(entity);
 
 	public void Delete(T entity)
 		=> RepositoryContext.Set<T>().Remove(entity);
@@ -29,7 +29,10 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
 
 	public IQueryable<T> FindAll(bool trackChanges)
 	{
-		return !trackChanges ? RepositoryContext.Set<T>() : RepositoryContext.Set<T>().AsNoTracking();
+		return 
+			!trackChanges ? 
+			RepositoryContext.Set<T>() :
+			RepositoryContext.Set<T>().AsNoTracking();
 	}
 
 	public IQueryable<T> FindByCondition(Expression<Func<T, bool>> conition, bool trackChanges)
