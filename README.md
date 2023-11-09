@@ -6,6 +6,8 @@ It's 32 chapters long including topics such as
 - Paging, Filtering, Sorting
 - Global Error Handling
 - Api Versioning
+- HATEOS
+- Action Filters
 - Caching
 - Rate Limiting and Throttling
 - JWT, Identity, and Refresh Tokens
