@@ -7,6 +7,7 @@ using Contracts;
 using Entities;
 using Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Shared.RequestFeatures;
 
 namespace Repository;
 public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
@@ -34,9 +35,24 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
 		return employee;
 	}
 
-	public async Task<IEnumerable<Employee>> GetEmployeesAsync(int companyId, bool trackChanges)
+	public async Task<IEnumerable<Employee>> GetEmployeesAsync(int companyId, EmployeeParameters employeeParameters ,bool trackChanges)
 	{
-		var employees = await FindByCondition(e => e.CompanyId == companyId, trackChanges)
+		if (!employeeParameters.ValidAgeRange)
+		{
+			throw new EmployeeInvalidAgeRangeException
+				(employeeParameters.MinAge, employeeParameters.MaxAge);
+		}
+
+		var pageSize = employeeParameters.PageSize;
+		var pageNum = employeeParameters.PageNumber;
+		var minAge = employeeParameters.MinAge;
+
+		var employees = await this
+			.FindByCondition(e => e.CompanyId == companyId, trackChanges)
+			.SearchByName(employeeParameters.SearchTerm)
+			.Filter(employeeParameters.MinAge, employeeParameters.MaxAge)
+			.Skip((pageNum - 1) * pageSize)
+			.Take(pageSize)
 			.OrderBy(e => e.Name)
 			.ToListAsync();
 

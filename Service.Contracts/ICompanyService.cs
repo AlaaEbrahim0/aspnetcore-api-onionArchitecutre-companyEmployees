@@ -2,6 +2,7 @@
 using System.Diagnostics.SymbolStore;
 using Entities;
 using Shared.DTOs;
+using Shared.RequestFeatures;
 
 namespace Service.Contracts;
 public interface ICompanyService
@@ -12,7 +13,7 @@ public interface ICompanyService
 	Task DeleteCompanyAsync(int companyId, bool trackChanges);
 	Task UpdateCompanyAsync(int companyId, CompanyForUpdationDto companyForUpdate, bool trackChanges);
 
-	Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges);
+	Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(CompanyParameters companyParameters, bool trackChanges);
 	Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<int> ids, bool trackChanges);
 	Task<(IEnumerable<CompanyDto> companies, string ids)>
 		CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection);

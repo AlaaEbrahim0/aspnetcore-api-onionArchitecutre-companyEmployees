@@ -1,11 +1,12 @@
 ﻿using Entities;
 using Shared.DTOs;
+using Shared.RequestFeatures;
 
 namespace Service.Contracts;
 
 public interface IEmployeeService
 {
-	Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(int companyId, bool trackChanges);
+	Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(int companyId, EmployeeParameters employeeParameters, bool trackChanges);
 	Task<EmployeeDto> GetEmployeeAsync(int companyId, int employeeId, bool trackChanges);
 	Task<EmployeeDto> CreateEmployeeForCompanyAsync(int companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges);
 	Task DeleteEmployeeForCompanyAsync(int companyId, int employeeId, bool trackChanges);

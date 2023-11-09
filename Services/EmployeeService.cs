@@ -4,6 +4,7 @@ using Entities;
 using Entities.Exceptions;
 using Service.Contracts;
 using Shared.DTOs;
+using Shared.RequestFeatures;
 
 namespace Services;
 
@@ -20,7 +21,8 @@ public class EmployeeService : IEmployeeService
 		this.mapper = mapper;
 	}
 
-	public async Task<EmployeeDto> CreateEmployeeForCompanyAsync(int companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
+	public async Task<EmployeeDto> CreateEmployeeForCompanyAsync
+		(int companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
 	{
 		await companyExistAsync(companyId, trackChanges);
 
@@ -56,11 +58,12 @@ public class EmployeeService : IEmployeeService
 	}
 	
 
-	public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(int companyId, bool trackChanges)
+	public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync
+		(int companyId, EmployeeParameters employeeParameters,bool trackChanges)
 	{
 		await companyExistAsync(companyId, trackChanges);
 
-		IEnumerable<Employee> employees = await repository.Employee.GetEmployeesAsync(companyId, trackChanges);
+		IEnumerable<Employee> employees = await repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
 
 		var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employees);
 
@@ -79,7 +82,8 @@ public class EmployeeService : IEmployeeService
 		await repository.SaveAsync();
 	}
 
-	public async Task UpdateEmployeeForCompanyAsync(int companyId, int employeeId, EmployeeForUpdationDto employeeForUpdate, bool compTrackChanges, bool empTrackChanges)
+	public async Task UpdateEmployeeForCompanyAsync
+		(int companyId, int employeeId, EmployeeForUpdationDto employeeForUpdate, bool compTrackChanges, bool empTrackChanges)
 	{
 		await companyExistAsync(companyId, compTrackChanges);
 

@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Service.Contracts;
 using Shared.DTOs;
+using Shared.RequestFeatures;
 
 namespace CompanyEmployees.Presentation.Controllers;
 
@@ -19,13 +21,14 @@ public class CompanyController: ControllerBase
 	}
 
     [HttpGet]
-	public async Task<IActionResult> GetCompaniesAsync()
+	public async Task<IActionResult> GetCompaniesAsync(CompanyParameters companyParameters)
 	{
-		var companies = await serviceManager.CompanyService.GetAllCompaniesAsync(false);
+		var companies = await serviceManager.CompanyService.GetAllCompaniesAsync(companyParameters ,false);
 		return Ok(companies);		
 	}
 
 	[HttpGet("collection/{ids}")]
+	[Route("CompanyCollection")]
 	public async Task<IActionResult> GetCompanyCollectionAsync(IEnumerable<int> ids)
 	{
 		var companies = await serviceManager.CompanyService.GetByIdsAsync(ids, false);
@@ -44,7 +47,7 @@ public class CompanyController: ControllerBase
 	public async Task<IActionResult> CreateCompanyAsync([FromBody] CompanyForCreationDto companyDto)
 	{
 		var company = await serviceManager.CompanyService.CreateCompanyAsync(companyDto);
-		return CreatedAtRoute("CompanyById", new { id = company.Id }, company);
+		return CreatedAtRoute("CompanyById", new { id = company?.Id }, company);
 	}
 
 	[HttpPost("collection")]

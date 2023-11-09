@@ -5,6 +5,7 @@ using Entities;
 using Entities.Exceptions;
 using Service.Contracts;
 using Shared.DTOs;
+using Shared.RequestFeatures;
 
 namespace Services;
 public class CompanyService: ICompanyService
@@ -40,10 +41,10 @@ public class CompanyService: ICompanyService
 		await repository.SaveAsync();
 	}
 
-	public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges)
+	public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(CompanyParameters companyParameters, bool trackChanges)
 	{
 		var companies = await repository.Company
-			.GetAllCompaniesAsync(trackChanges);
+			.GetAllCompaniesAsync(companyParameters ,trackChanges);
 
 		var companiesDto = mapper.Map<IEnumerable<CompanyDto>>(companies);
 		return companiesDto;

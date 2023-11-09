@@ -10,9 +10,9 @@ using Shared.DTOs;
 
 namespace CompanyEmployees.Extensions;
 
-public static class ServiceExtensions
+public static class DependencyInjection
 {
-	public static void ConfigureCors(this IServiceCollection services)
+	public static IServiceCollection ConfigureCors(this IServiceCollection services)
 	{
 		services.AddCors(options =>
 		{
@@ -24,30 +24,40 @@ public static class ServiceExtensions
 					.AllowAnyHeader();
 			});
 		});
+		return services;
+
 	}
-	public static void ConfigureIISIntegration(this IServiceCollection services)
+	public static IServiceCollection ConfigureIISIntegration(this IServiceCollection services)
 	{
 		services.Configure<IISOptions>(options =>
 		{			
 
 		});
+		return services;
+
 	}
 
-	public static void ConfigureLoggerService(this IServiceCollection services)
+	public static IServiceCollection ConfigureLoggerService(this IServiceCollection services)
 	{
 		services.AddSingleton<ILoggerManager, LoggerManager>();
+		return services;
+
 	}
 
-	public static void ConfigureRepositoryManager(this IServiceCollection services)
+	public static IServiceCollection ConfigureRepositoryManager(this IServiceCollection services)
 	{
 		services.AddScoped<IRepositoryManager, RepositoryManager>();
+		return services;
+
 	}
-	public static void ConfigureServiceManager(this IServiceCollection services)
+	public static IServiceCollection ConfigureServiceManager(this IServiceCollection services)
 	{
 		services.AddScoped<IServiceManager, ServiceManager>();
+		return services;
+
 	}
 
-	public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
+	public static IServiceCollection ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContextPool<RepositoryContext>(options =>
 		{
@@ -56,9 +66,11 @@ public static class ServiceExtensions
 				b.MigrationsAssembly(nameof(Repository));
 			});
 		});
+		return services;
+
 	}
 
-	public static void ConfigureControllersAndFormatters(this IServiceCollection services)
+	public static IServiceCollection ConfigureControllersAndFormatters(this IServiceCollection services)
 	{
 		services
 		.AddControllers(config =>
@@ -78,6 +90,8 @@ public static class ServiceExtensions
 		.AddCustomCSVFormatter<CompanyDto>()
 		.AddXmlDataContractSerializerFormatters()
 		.AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
+
+		return services;
 	}
 
 	private static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
