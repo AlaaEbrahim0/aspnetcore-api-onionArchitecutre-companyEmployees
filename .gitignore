@@ -479,3 +479,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 /.idea
+/requester.http

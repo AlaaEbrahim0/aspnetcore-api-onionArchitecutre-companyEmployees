@@ -1,5 +1,4 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -21,7 +20,7 @@ public class CompanyController: ControllerBase
 	}
 
     [HttpGet]
-	public async Task<IActionResult> GetCompaniesAsync(CompanyParameters companyParameters)
+	public async Task<IActionResult> GetCompaniesAsync([FromQuery] CompanyParameters companyParameters)
 	{
 		var companies = await serviceManager.CompanyService.GetAllCompaniesAsync(companyParameters ,false);
 		return Ok(companies);		
