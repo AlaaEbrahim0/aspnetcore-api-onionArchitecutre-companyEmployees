@@ -18,4 +18,5 @@ public static class CompanyRepositoryExtensions
         var lowercasedTrimmedSearchTerm = searchTerm.Trim().ToLower();
         return companies.Where(e => e.Name!.Equals(lowercasedTrimmedSearchTerm));
     }
+
 }

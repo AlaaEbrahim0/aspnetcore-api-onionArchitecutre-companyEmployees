@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Dynamic;
+using AutoMapper;
 using Contracts;
 using Entities;
 using Entities.Exceptions;
@@ -13,12 +14,18 @@ public class EmployeeService : IEmployeeService
 	private readonly IRepositoryManager repository;
 	private readonly ILoggerManager logger;
 	private readonly IMapper mapper;
+	private readonly IDataShaper<EmployeeDto> dataShaper;
 
-	public EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+	public EmployeeService(
+		IRepositoryManager repository, 
+		ILoggerManager logger, 
+		IMapper mapper, 
+		IDataShaper<EmployeeDto> dataShaper)
 	{
 		this.repository = repository;
 		this.logger = logger;
 		this.mapper = mapper;
+		this.dataShaper = dataShaper;
 	}
 
 	public async Task<EmployeeDto> CreateEmployeeForCompanyAsync
@@ -58,7 +65,7 @@ public class EmployeeService : IEmployeeService
 	}
 	
 
-	public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync
+	public async Task<IEnumerable<ExpandoObject>> GetEmployeesAsync
 		(int companyId, EmployeeParameters employeeParameters,bool trackChanges)
 	{
 		await companyExistAsync(companyId, trackChanges);
@@ -67,7 +74,7 @@ public class EmployeeService : IEmployeeService
 
 		var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employees);
 
-		return employeesDto;
+		return dataShaper.ShapeData(employeesDto, employeeParameters.Fields);
 	}
 
 	public async Task DeleteEmployeeForCompanyAsync(int companyId, int employeeId, bool trackChanges)

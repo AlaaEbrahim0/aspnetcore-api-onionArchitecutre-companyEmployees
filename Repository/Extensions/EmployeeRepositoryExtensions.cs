@@ -11,6 +11,7 @@ public static partial class EmployeeRepositoryExtensions
     {
         return employees.Where(e => e.Age >= minAge && e.Age <= maxAge);
     }
+
     public static IQueryable<Employee> SearchByName(this IQueryable<Employee> employees, string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))

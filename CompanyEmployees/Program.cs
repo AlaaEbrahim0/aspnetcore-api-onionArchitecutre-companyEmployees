@@ -1,6 +1,9 @@
 using CompanyEmployees.Presentation.ActionFilters;
 using Contracts;
 using NLog;
+using Services.DataShaping;
+using Shared.DTOs;
+
 namespace CompanyEmployees;
 
 public class Program
@@ -20,7 +23,8 @@ public class Program
 			.AddAutoMapper(typeof(Program))
 			.ConfigureSqlContext(builder.Configuration)
 			.ConfigureControllersAndFormatters()
-			.AddScoped<ValidationFilterAttribute>();
+			.AddScoped<ValidationFilterAttribute>()
+			.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 
 		builder.Services.Configure<ApiBehaviorOptions>(options =>
 		{
