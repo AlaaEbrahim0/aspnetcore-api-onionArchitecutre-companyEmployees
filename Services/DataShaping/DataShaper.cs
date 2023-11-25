@@ -16,6 +16,7 @@ public class DataShaper<T> : IDataShaper<T> where T : class
     {
         Properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
     }
+
     public IEnumerable<ExpandoObject> ShapeData(IEnumerable<T> entites, string fieldsString)
 	{
 		var requiredProperties = GetRequiredProperties(fieldsString);
@@ -55,7 +56,10 @@ public class DataShaper<T> : IDataShaper<T> where T : class
 	{
 		var propertiesList = new List<PropertyInfo> ();
 		if (string.IsNullOrWhiteSpace(fieldsString))
+		{
+			propertiesList = Properties.ToList();
 			return propertiesList;
+		}
 
 		var fields = fieldsString.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
 		foreach (var field in fields)
