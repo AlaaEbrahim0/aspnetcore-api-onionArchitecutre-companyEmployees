@@ -21,9 +21,9 @@ public class CompanyService: ICompanyService
 		this.mapper = mapper;
 	}
 
-	public async Task<CompanyDto?> CreateCompanyAsync(CompanyForCreationDto CompanyForCreationDto)
+	public async Task<CompanyDto?> CreateCompanyAsync(CompanyForCreationDto companyForCreationDto)
 	{
-		var company = mapper.Map<Company>(CompanyForCreationDto);
+		var company = mapper.Map<Company>(companyForCreationDto);
 
 		repository.Company.CreateCompany(company);
 		await repository.SaveAsync();
