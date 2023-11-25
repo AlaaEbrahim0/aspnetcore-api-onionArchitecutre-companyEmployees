@@ -41,7 +41,7 @@ public class Program
 
 		app.ConfigureExceptionHandler(logger);
 
-		if (app.Environment.IsProduction()) 
+		if (app.Environment.IsProduction())   
 			app.UseHsts();
 
 		// Configure the HTTP request pipeline.

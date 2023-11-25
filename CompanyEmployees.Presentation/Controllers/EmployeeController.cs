@@ -20,7 +20,7 @@ public class EmployeeController : ControllerBase
 
 	[HttpGet]
 	public async Task<IActionResult> GetEmployeesAsync(int companyId, [FromQuery] EmployeeParameters employeeParameters)
-	{
+	{ 
 		var employees = await serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, false);
 		return Ok(employees);
 	}

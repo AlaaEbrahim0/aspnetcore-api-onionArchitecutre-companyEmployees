@@ -102,10 +102,10 @@ public static class DependencyInjection
 			.AddMvc()
 			.AddNewtonsoftJson()
 			.Services
-			.BuildServiceProvider()
-			.GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
-			.OfType<NewtonsoftJsonPatchInputFormatter>()
-			.First();
+				.BuildServiceProvider()
+				.GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
+				.OfType<NewtonsoftJsonPatchInputFormatter>()
+				.First();
 	}
 
 }
