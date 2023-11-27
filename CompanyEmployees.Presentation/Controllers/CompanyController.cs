@@ -1,6 +1,9 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Service.Contracts;
 using Shared.DTOs;
@@ -19,7 +22,15 @@ public class CompanyController: ControllerBase
 		this.serviceManager = serviceManager;
 	}
 
+	[HttpOptions]
+	public IActionResult GetCompaniesOptions()
+	{
+		HttpContext.Response.Headers.Add("Allow", "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD");
+		return Ok();
+	}
+
     [HttpGet]
+	[HttpHead]
 	public async Task<IActionResult> GetCompaniesAsync([FromQuery] CompanyParameters companyParameters)
 	{
 		var companies = await serviceManager.CompanyService.GetAllCompaniesAsync(companyParameters ,false);

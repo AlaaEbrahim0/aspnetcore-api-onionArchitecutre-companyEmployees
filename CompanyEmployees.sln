@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		requester.http = requester.http
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompanyEmployees.Tests", "..\..\UnitTestingAndMoq\ApiForUnitTestingAndMocking\ApiTests\CompanyEmployees.Tests.csproj", "{04D31FCE-D9FA-42D9-80DB-4FD34CB12F58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompanyEmployees.Tests", "..\..\UnitTestingAndMoq\ApiForUnitTestingAndMocking\CompanyEmployees.Tests\CompanyEmployees.Tests.csproj", "{92DC4563-F92F-4B1C-9FDB-EE91BDA2691A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,10 +70,10 @@ Global
 		{7B480C3F-0F4F-4972-87C4-695C50666884}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B480C3F-0F4F-4972-87C4-695C50666884}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B480C3F-0F4F-4972-87C4-695C50666884}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04D31FCE-D9FA-42D9-80DB-4FD34CB12F58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04D31FCE-D9FA-42D9-80DB-4FD34CB12F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04D31FCE-D9FA-42D9-80DB-4FD34CB12F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04D31FCE-D9FA-42D9-80DB-4FD34CB12F58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92DC4563-F92F-4B1C-9FDB-EE91BDA2691A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92DC4563-F92F-4B1C-9FDB-EE91BDA2691A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92DC4563-F92F-4B1C-9FDB-EE91BDA2691A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92DC4563-F92F-4B1C-9FDB-EE91BDA2691A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

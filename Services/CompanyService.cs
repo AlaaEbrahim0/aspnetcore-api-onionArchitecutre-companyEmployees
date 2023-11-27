@@ -53,7 +53,7 @@ public class CompanyService: ICompanyService
 	public async Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<int> ids, bool trackChanges)
 	{
 		if (ids is null)
-			throw new IdParametersBadRequestException();
+			throw new IdParametersBadRequestException();	
 
 		var companies = await repository.Company.GetByIdsAsync(ids, trackChanges);
 		if (ids.Count() != companies.Count())
@@ -104,7 +104,8 @@ public class CompanyService: ICompanyService
 		await repository.SaveAsync();
 	}
 
-	async Task<(IEnumerable<CompanyDto> companies, string ids)> ICompanyService.CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection)
+	async Task<(IEnumerable<CompanyDto> companies, string ids)> 
+		ICompanyService.CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection)
 	{
 		if (companyCollection is null)
 			throw new CompanyCollectionBadRequest();
