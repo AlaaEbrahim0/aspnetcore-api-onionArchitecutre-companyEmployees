@@ -1,27 +1,21 @@
-﻿namespace Shared.RequestFeatures;
+﻿using System.Runtime.CompilerServices;
+
+namespace Shared.RequestFeatures;
 
 public class PagedList<T>: List<T>
 {
     public MetaData MetaData { get; set; }
-    public PagedList(IQueryable<T> items, int count, int pageSize, int pageNumber)
+
+    public PagedList(List<T> items, int count, int pageNumber, int pageSize)
     {
         MetaData = new MetaData()
         {
-            TotalPages = (int)Math.Ceiling(count / (double)pageSize),
-            TotalCount = count,
             PageSize = pageSize,
-            CurrentPage = pageNumber
+            CurrentPage = pageNumber,
+            TotalCount = count,
+            TotalPages = (int)Math.Ceiling(count / (double)pageSize),
         };
-    }
 
-    public static PagedList<T> ToPagedList(IQueryable<T> source, int pageNumber, 
-        int pageSize)
-    {
-        var count = source.Count();
-        var items = source
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize);
-
-        return new PagedList<T>(items, count, pageSize, pageNumber);
+        this.AddRange(items);
     }
 }

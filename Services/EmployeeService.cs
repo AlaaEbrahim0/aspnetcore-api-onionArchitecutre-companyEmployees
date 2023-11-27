@@ -65,16 +65,16 @@ public class EmployeeService : IEmployeeService
 	}
 	
 
-	public async Task<IEnumerable<ExpandoObject>> GetEmployeesAsync
+	public async Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)> GetEmployeesAsync
 		(int companyId, EmployeeParameters employeeParameters,bool trackChanges)
 	{
 		await companyExistAsync(companyId, trackChanges);
 
-		IEnumerable<Employee> employees = await repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
+		var employeesWithPagingData = await repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
 
-		var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employees);
+		var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesWithPagingData);
 
-		return dataShaper.ShapeData(employeesDto, employeeParameters.Fields);
+		return (dataShaper.ShapeData(employeesDto, employeeParameters.Fields), employeesWithPagingData.MetaData);
 	}
 
 	public async Task DeleteEmployeeForCompanyAsync(int companyId, int employeeId, bool trackChanges)

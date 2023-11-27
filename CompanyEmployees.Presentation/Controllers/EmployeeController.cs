@@ -1,4 +1,5 @@
-﻿using CompanyEmployees.Presentation.ActionFilters;
+﻿using System.Text.Json;
+using CompanyEmployees.Presentation.ActionFilters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -19,10 +20,13 @@ public class EmployeeController : ControllerBase
 	}
 
 	[HttpGet]
+	[HttpHead]
 	public async Task<IActionResult> GetEmployeesAsync(int companyId, [FromQuery] EmployeeParameters employeeParameters)
 	{ 
-		var employees = await serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, false);
-		return Ok(employees);
+		var employeesPagedResult = await serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, false);
+		Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(employeesPagedResult.metaData));
+
+		return Ok(employeesPagedResult.employees);
 	}
 
 	[HttpGet("{employeeId:int}")]

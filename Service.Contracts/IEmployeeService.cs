@@ -7,7 +7,7 @@ namespace Service.Contracts;
 
 public interface IEmployeeService
 {
-	Task<IEnumerable<ExpandoObject>> GetEmployeesAsync(int companyId, EmployeeParameters employeeParameters, bool trackChanges);
+	Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)> GetEmployeesAsync(int companyId, EmployeeParameters employeeParameters, bool trackChanges);
 	Task<EmployeeDto> GetEmployeeAsync(int companyId, int employeeId, bool trackChanges);
 	Task<EmployeeDto> CreateEmployeeForCompanyAsync(int companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges);
 	Task DeleteEmployeeForCompanyAsync(int companyId, int employeeId, bool trackChanges);

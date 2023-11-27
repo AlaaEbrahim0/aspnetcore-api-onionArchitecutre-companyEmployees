@@ -38,22 +38,26 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         return employee;
     }
 
-    public async Task<IEnumerable<Employee>> GetEmployeesAsync(int companyId, EmployeeParameters empParams, bool trackChanges)
-    {
-        if (!empParams.ValidAgeRange)
-            throw new EmployeeInvalidAgeRangeException(empParams.MinAge, empParams.MaxAge);
+	public async Task<PagedList<Employee>> GetEmployeesAsync(int companyId, EmployeeParameters empParams, bool trackChanges)
+	{
+		if (!empParams.ValidAgeRange)
+			throw new EmployeeInvalidAgeRangeException(empParams.MinAge, empParams.MaxAge);
 
-        var employees = await 
-            FindByCondition(e => e.CompanyId == companyId, trackChanges)
-            .SearchByName(empParams.SearchTerm)
-            .Sort(empParams.OrderBy)
-            .Filter(empParams.MinAge, empParams.MaxAge)
-            .Skip((empParams.PageNumber - 1) * empParams.PageSize)
-            .Take(empParams.PageSize)
-            .ToListAsync();
 
-        return employees;
+        var employeesQuery = FindByCondition(e => e.CompanyId == companyId, trackChanges)
+			.SearchByName(empParams.SearchTerm)
+			.Sort(empParams.OrderBy)
+			.Filter(empParams.MinAge, empParams.MaxAge);
 
-    }
+        var employeesCount = await employeesQuery.CountAsync();
+
+        var employees = await employeesQuery
+			.Skip((empParams.PageNumber - 1) * empParams.PageSize)
+			.Take(empParams.PageSize)
+			.ToListAsync();
+
+		return new PagedList<Employee>(employees, employeesCount, empParams.PageNumber, empParams.PageSize);
+	}
+
 
 }

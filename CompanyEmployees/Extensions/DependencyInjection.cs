@@ -21,7 +21,8 @@ public static class DependencyInjection
 				builder
 					.AllowAnyMethod()
 					.AllowAnyOrigin()
-					.AllowAnyHeader();
+					.AllowAnyHeader()
+					.WithExposedHeaders("X-Pagination");
 			});
 		});
 		return services;
@@ -72,6 +73,7 @@ public static class DependencyInjection
 
 	public static IServiceCollection ConfigureControllersAndFormatters(this IServiceCollection services)
 	{
+		
 		services
 		.AddControllers(config =>
 		{
