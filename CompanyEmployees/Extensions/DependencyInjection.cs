@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using System.Dynamic;
+using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -89,7 +90,8 @@ public static class DependencyInjection
 			
 				
 		})
-		.AddCustomCSVFormatter<CompanyDto>()
+		.AddCustomCSVFormatter<ExpandoObject>()
+		.AddCustomCSVFormatter<BaseDto>()
 		.AddXmlDataContractSerializerFormatters()
 		.AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
 

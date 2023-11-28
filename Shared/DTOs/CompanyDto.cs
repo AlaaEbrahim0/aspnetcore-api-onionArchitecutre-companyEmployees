@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.DTOs;
 
-public record CompanyDto
+public record CompanyDto: BaseDto
 {
     public int Id { get; init; }	
     public string? Name { get; init; }	

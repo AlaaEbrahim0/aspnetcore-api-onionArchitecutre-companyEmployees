@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Dynamic;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.VisualBasic;
-using Shared.DTOs;
 
 namespace CompanyEmployees.CustomFormatters;
 
@@ -18,7 +15,12 @@ public class CsvOutputFormatter<T> : TextOutputFormatter
 
 	protected override bool CanWriteType(Type? type)
 	{
-        if (typeof(T).IsAssignableFrom(type) || 
+		if (typeof(Type) == typeof(ExpandoObject))
+		{
+            return base.CanWriteType(type);
+		}
+
+		if (typeof(T).IsAssignableFrom(type) || 
             typeof(IEnumerable<T>).IsAssignableFrom(type))
         {
             return base.CanWriteType(type);
@@ -33,7 +35,7 @@ public class CsvOutputFormatter<T> : TextOutputFormatter
 
         if (context.Object is IEnumerable<T>) 
         {
-            foreach(var entity in (IEnumerable<T>)context.Object) 
+            foreach(var entity in (IEnumerable<T>) context.Object) 
             {
                 FormatCsv(buffer, entity);
             }
@@ -45,16 +47,33 @@ public class CsvOutputFormatter<T> : TextOutputFormatter
 
         await response.WriteAsync(buffer.ToString());
 	}
-	private static void FormatCsv(StringBuilder buffer, T entity) 
-    {
-        var properties = entity.GetType().GetProperties();
-        foreach (var property in properties)
-        {
-            var value = property.GetValue(entity);
-            buffer.Append($"{value},");
-        }
+	private static void FormatCsv(StringBuilder buffer, T entity)
+	{
+		if (entity is ExpandoObject expandoObject)
+		{
+			var dictionary = expandoObject as IDictionary<string, object>;
 
-        buffer.Length--;
-        buffer.AppendLine();
-    }
+			if (dictionary != null)
+			{
+				foreach (var keyValuePair in dictionary)
+				{
+					var value = keyValuePair.Value;
+					buffer.Append($"{value},");
+				}
+			}
+		}
+		else
+		{
+			var properties = entity.GetType().GetProperties();
+			foreach (var property in properties)
+			{
+				var value = property.GetValue(entity);
+				buffer.Append($"{value},");
+			}
+		}
+
+		buffer.Length--;
+		buffer.AppendLine();
+	}
+
 }
