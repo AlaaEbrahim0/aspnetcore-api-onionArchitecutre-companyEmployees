@@ -1,6 +1,5 @@
-using System.Diagnostics.Contracts;
+using System.Collections;
 using AutoMapper;
-using AutoMapper.Configuration.Conventions;
 using Contracts;
 using Entities;
 using Entities.Exceptions;
@@ -67,8 +66,8 @@ public class CompanyServiceTests
 			.ReturnsAsync(company);
 
 		// Act
-		Func<int, bool, Task<CompanyDto?>> func = async (companyId, trackChanges) 
-			=> await _sut.GetCompanyAsync(companyId, trackChanges);
+		Func<int, bool, Task<CompanyDto?>> func = async (id, track) 
+			=> await _sut.GetCompanyAsync(id, track);
 
 		// Assert 
 		await Assert.ThrowsAsync<CompanyNotFoundException>(() => func(companyId, trackChanges));
@@ -315,4 +314,129 @@ public class CompanyServiceTests
 
 	}
 
+	[Fact]
+	public async Task GetCompanyForPatchAsync_ShouldThrowCompanyNotFoundException_WhenCompanyDoesNotExist()
+	{
+		// Arrange
+		int companyId = It.IsAny<int>();
+		bool trackChanges = false;
+
+		_repoManagerMock.Setup(e => e.Company.GetCompanyAsync(companyId, trackChanges))
+			.ThrowsAsync(new CompanyNotFoundException(companyId));
+		
+		// Act
+		Func<int, bool, Task<(CompanyForUpdationDto, Company)>> func = async (companyId, trackChanges)
+			=> await _sut.GetCompanyForPatchAsync(companyId, trackChanges);
+
+		// Assert
+		await Assert.ThrowsAsync<CompanyNotFoundException>(() => func(companyId, trackChanges));
+	}
+
+	[Fact]
+	public async Task GetCompanyForPatchAsync_ShouldReturnTupleOfCompanyForUpdationDtoAndCompanyDto_WhenCompanyExists()
+	{
+		// Arrange
+		int companyId = It.IsAny<int>();
+		bool trackChanges = false;
+		var company = new Company()
+		{
+			Id = companyId,
+			Name = "test",
+			Country = "country test",
+			Address = "address test",
+			Employees = new List<Employee>()
+		};
+		var actualcompanyForUpdationDto = _mapper.Map<CompanyForUpdationDto>(company);
+		_repoManagerMock.Setup(e => e.Company.GetCompanyAsync(companyId, trackChanges))
+			.ReturnsAsync(company);
+
+		// Act
+		var result = await _sut.GetCompanyForPatchAsync(companyId, trackChanges);
+
+		// Assert
+		Assert.NotNull(result.Item1);
+		Assert.NotNull(result.Item2);
+		Assert.IsType<CompanyForUpdationDto>(result.Item1);
+		Assert.IsType<Company>(result.Item2);
+		Assert.Equal(result.Item2, company);
+		Assert.Equal(result.Item1, actualcompanyForUpdationDto);
+	}
+
+	[Fact]
+	public async Task SaveChangesForPatchAsync_ShouldReturnNothing()
+	{
+		// Arrange
+		var companyForUpdationDto = new CompanyForUpdationDto
+		{
+			Name = "test",
+			Country = "country test",
+			Address = "address test"
+		};
+		var actualCompany = new Company()
+		{
+			Name = "test",
+			Country = "country test",
+			Address = "address test"
+		};
+		_repoManagerMock.Setup(e => e.SaveAsync())
+			.Verifiable(Times.Once);
+		
+		await _sut.SaveChangesForPatchAsync(companyForUpdationDto, actualCompany);
+
+		var expectedCompany = _mapper.Map(companyForUpdationDto, actualCompany);
+        Assert.Equal(actualCompany, expectedCompany, new EntityComparer<Company>());
+		Mock.Verify();
+		
+	}
+
+	[Fact]
+	public async Task CreateCompanyCollectionAsync_ShouldThrowCompanyCollectionBadRequest_WhenCompanyCollectionIsNull()
+	{
+		// Arrange
+		IEnumerable<CompanyForCreationDto> companyCollection = null!;
+
+		// Act
+		Func<IEnumerable<CompanyForCreationDto>, Task<(IEnumerable<CompanyDto> companies, string ids)>> 
+			func = async (companyCollection) => await _sut.CreateCompanyCollectionAsync(companyCollection);
+
+		// Assert
+		await Assert.ThrowsAsync<CompanyCollectionBadRequest>(() => func(companyCollection));
+	}
+	
+	[Fact]
+	public async Task CreateCompanyCollectionAsync_ShouldReturnATupleOfEnumerableOfCompanyDtoAndStringOfIds_WhenCompanyCollectionIsNotNull()
+	{
+		// Arrange
+		IEnumerable<CompanyForCreationDto> companyCollection = new []
+		{
+			new CompanyForCreationDto(){ Name = "test01", Address = "address test01", Country = "country test01"},
+			new CompanyForCreationDto(){ Name = "test02", Address = "address test02", Country = "country test02"},
+			new CompanyForCreationDto(){ Name = "test03", Address = "address test03", Country = "country test03"},
+			new CompanyForCreationDto(){ Name = "test04", Address = "address test04", Country = "country test04"},
+			new CompanyForCreationDto(){ Name = "test05", Address = "address test05", Country = "country test05"},
+			new CompanyForCreationDto(){ Name = "test05", Address = "address test05", Country = "country test05"},
+		};
+		var companiesToBeCreated = _mapper.Map<IEnumerable<Company>>(companyCollection);
+		var actualCompaniesDtos = _mapper.Map <IEnumerable<CompanyDto>>(companiesToBeCreated);
+		var actualIds = string.Join(',', companiesToBeCreated.Select(x => x.Id));
+		
+		foreach (var company in companiesToBeCreated)
+		{
+			_repoManagerMock.Setup(e => e.Company.CreateCompany(company))
+				.Verifiable(Times.Once);
+		}
+		_repoManagerMock.Setup(e => e.SaveAsync())
+			.Verifiable(Times.Once);
+		
+		// Act
+		var result = await _sut.CreateCompanyCollectionAsync(companyCollection);
+
+		// Assert
+		Assert.NotNull(result.ids);
+		Assert.NotNull(result.companies);
+		Assert.IsAssignableFrom<IEnumerable<CompanyDto>>(result.companies);
+		Assert.IsType<string>(result.ids);
+		Assert.Equal(actualCompaniesDtos, result.companies);
+		Assert.Equal(actualIds, result.ids);
+	}
 }
