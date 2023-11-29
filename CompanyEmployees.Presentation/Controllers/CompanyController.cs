@@ -15,11 +15,11 @@ namespace CompanyEmployees.Presentation.Controllers;
 [ApiController]
 public class CompanyController: ControllerBase
 {
-	private readonly IServiceManager serviceManager;
+	private readonly IServiceManager _serviceManager;
 
 	public CompanyController(IServiceManager serviceManager)
     {
-		this.serviceManager = serviceManager;
+		this._serviceManager = serviceManager;
 	}
 
 	[HttpOptions]
@@ -33,7 +33,7 @@ public class CompanyController: ControllerBase
 	[HttpHead]
 	public async Task<IActionResult> GetCompaniesAsync([FromQuery] CompanyParameters companyParameters)
 	{
-		var companies = await serviceManager.CompanyService.GetAllCompaniesAsync(companyParameters ,false);
+		var companies = await _serviceManager.CompanyService.GetAllCompaniesAsync(companyParameters ,false);
 		return Ok(companies);		
 	}
 
@@ -41,14 +41,14 @@ public class CompanyController: ControllerBase
 	[Route("CompanyCollection")]
 	public async Task<IActionResult> GetCompanyCollectionAsync(IEnumerable<int> ids)
 	{
-		var companies = await serviceManager.CompanyService.GetByIdsAsync(ids, false);
+		var companies = await _serviceManager.CompanyService.GetByIdsAsync(ids, false);
 		return Ok(companies);
 	}
 
 	[HttpGet("{id:int}", Name = "CompanyById")]
 	public async Task<IActionResult> GetCompanyAsync(int id)
 	{
-		var company = await serviceManager.CompanyService.GetCompanyAsync(id, false);
+		var company = await _serviceManager.CompanyService.GetCompanyAsync(id, false);
 		return Ok(company);
 	}
 
@@ -56,7 +56,7 @@ public class CompanyController: ControllerBase
 	[ServiceFilter(typeof(ValidationFilterAttribute))]
 	public async Task<IActionResult> CreateCompanyAsync([FromBody] CompanyForCreationDto companyDto)
 	{
-		var company = await serviceManager.CompanyService.CreateCompanyAsync(companyDto);
+		var company = await _serviceManager.CompanyService.CreateCompanyAsync(companyDto);
 		return CreatedAtRoute("CompanyById", new { id = company?.Id }, company);
 	}
 
@@ -66,14 +66,14 @@ public class CompanyController: ControllerBase
 		if (!ModelState.IsValid)
 			return UnprocessableEntity(ModelState);
 
-		var result = await serviceManager.CompanyService.CreateCompanyCollectionAsync(companies);
-		return CreatedAtAction(nameof(GetCompanyCollectionAsync), new { ids = result.ids }, result.companies);
+		var result = await _serviceManager.CompanyService.CreateCompanyCollectionAsync(companies);
+		return CreatedAtRoute("CompanyCollection", new { ids = result.ids }, result.companies);
 	}
 
 	[HttpDelete("{companyId:int}")]
 	public async Task<IActionResult> DeleteCompanyAsync(int companyId)
 	{
-		await serviceManager.CompanyService.DeleteCompanyAsync(companyId, false);
+		await _serviceManager.CompanyService.DeleteCompanyAsync(companyId, false);
 		return Ok($"Company with Id: {companyId} has been deleted successfully");
 	}
 
@@ -89,7 +89,7 @@ public class CompanyController: ControllerBase
 		//if (!ModelState.IsValid)
 		//	return UnprocessableEntity(ModelState);
 
-		await serviceManager.CompanyService.UpdateCompanyAsync(companyId, companyToUpdate, true);
+		await _serviceManager.CompanyService.UpdateCompanyAsync(companyId, companyToUpdate, true);
 		return Ok($"Company with Id: {companyId} has been updated successfully");
 	}
 
@@ -99,7 +99,7 @@ public class CompanyController: ControllerBase
 		if (patchDocument is null)
 			return BadRequest("CompanyForUpdation Dto is null");
 
-		var result = await serviceManager.CompanyService.GetCompanyForPatchAsync(companyId, true);
+		var result = await _serviceManager.CompanyService.GetCompanyForPatchAsync(companyId, true);
 
 		patchDocument.ApplyTo(result.companyForPatch, ModelState);
 
@@ -108,7 +108,7 @@ public class CompanyController: ControllerBase
 		if (!ModelState.IsValid)
 			return UnprocessableEntity(ModelState);
 
-		await serviceManager.CompanyService.SaveChangesForPatchAsync(result.companyForPatch, result.companyEntity);
+		await _serviceManager.CompanyService.SaveChangesForPatchAsync(result.companyForPatch, result.companyEntity);
 		return NoContent();
 
 	}

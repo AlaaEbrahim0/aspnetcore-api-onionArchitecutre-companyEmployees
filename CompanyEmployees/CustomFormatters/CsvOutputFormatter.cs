@@ -47,7 +47,7 @@ public class CsvOutputFormatter<T> : TextOutputFormatter
 
         await response.WriteAsync(buffer.ToString());
 	}
-	private static void FormatCsv(StringBuilder buffer, T entity)
+	private static void FormatCsv(StringBuilder buffer, T? entity)
 	{
 		if (entity is ExpandoObject expandoObject)
 		{

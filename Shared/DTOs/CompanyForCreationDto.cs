@@ -5,4 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Shared.DTOs;
-public record CompanyForCreationDto : CompanyForCreationOrUpdation { }
+public record CompanyForCreationDto : CompanyForCreationOrUpdation 
+{
+	public IEnumerable<EmployeeForCreationDto>? Employees { get; init; }
+}

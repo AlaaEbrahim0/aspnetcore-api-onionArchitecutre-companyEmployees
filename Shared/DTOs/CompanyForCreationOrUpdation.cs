@@ -20,6 +20,6 @@ public abstract record CompanyForCreationOrUpdation
 	[MaxLength(56)]	
 	public string? Country { get; init; }
 
-	public IEnumerable<EmployeeForCreationDto>? Employees { get; init; }
+
 }
 
