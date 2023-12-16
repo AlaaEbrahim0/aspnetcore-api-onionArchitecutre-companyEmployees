@@ -20,7 +20,7 @@ public static class ExceptionMiddlewareExtensions
 		return builder;
 	}
 
-	public static void ConfigureExceptionHandler(this WebApplication app, ILoggerManager logger)
+	public static void ConfigureExceptionHandler(this IApplicationBuilder app, ILoggerManager logger)
 	{
 		app.UseExceptionHandler(options =>
 		{
@@ -29,7 +29,7 @@ public static class ExceptionMiddlewareExtensions
 				context.Response.ContentType = "application/json";
 
 				var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-				if (exceptionHandlerFeature != null)
+				if (exceptionHandlerFeature is not null)
 				{
 					context.Response.StatusCode = exceptionHandlerFeature.Error
 					switch

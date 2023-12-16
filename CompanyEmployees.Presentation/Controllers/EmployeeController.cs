@@ -47,7 +47,7 @@ public class EmployeeController : ControllerBase
 	[HttpDelete("{employeeId:int}")]
 	public async Task<IActionResult> DeleteEmployeeForCompanyAsync(int companyId, int employeeId)
 	{
-		await serviceManager.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, employeeId, false);
+		await serviceManager.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, employeeId, true);
 		return Ok($"Employee with id: {employeeId} has been deleted successfully");
 	}
 

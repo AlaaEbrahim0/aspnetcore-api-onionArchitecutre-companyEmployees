@@ -1,9 +1,7 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Service.Contracts;
 using Shared.DTOs;

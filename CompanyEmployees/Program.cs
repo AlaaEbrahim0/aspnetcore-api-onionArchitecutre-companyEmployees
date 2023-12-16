@@ -44,7 +44,6 @@ public class Program
 		if (app.Environment.IsProduction())   
 			app.UseHsts();
 
-		// Configure the HTTP request pipeline.
 		app.UseHttpsRedirection();
 
 		// enables using static files for the request
