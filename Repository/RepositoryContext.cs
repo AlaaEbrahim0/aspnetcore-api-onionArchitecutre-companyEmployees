@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Repository.Configurations;
@@ -11,11 +12,13 @@ public class RepositoryContext: IdentityDbContext<AppUser>
     {
         
     }
-
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
 
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Employees)

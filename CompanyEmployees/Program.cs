@@ -16,11 +16,15 @@ public class Program
 
 		builder.Services
 			.ConfigureCors()
-			.ConfigureIISIntegration()
 			.ConfigureLoggerService()
+			.ConfigureIISIntegration()
 			.ConfigureRepositoryManager()
 			.ConfigureServiceManager()
 			.ConfigureCaching()
+			.ConfigureJwtOptions(builder.Configuration)
+            .ConfigureIdentity()
+			.ConfigureAuthentication(builder.Configuration)
+			.ConfigureAuthorization()
 			.AddAutoMapper(typeof(Program))
 			.ConfigureSqlContext(builder.Configuration)
 			.ConfigureControllersAndFormatters()
@@ -58,6 +62,8 @@ public class Program
 		app.UseCors("CorsPolicy");
 
 		app.UseResponseCaching();
+
+		app.UseAuthentication();
 
 		app.UseAuthorization();
 

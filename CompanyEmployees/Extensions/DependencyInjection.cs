@@ -1,15 +1,21 @@
 ﻿using System.Dynamic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using Contracts;
 using Entities.Models;
 using LoggerService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service.Contracts;
 using Services;
 using Shared.DTOs;
+using Shared.Options;
 
 namespace CompanyEmployees.Extensions;
 
@@ -31,6 +37,7 @@ public static class DependencyInjection
 		return services;
 
 	}
+
 	public static IServiceCollection ConfigureIISIntegration(this IServiceCollection services)
 	{
 		services.Configure<IISOptions>(options =>
@@ -38,22 +45,60 @@ public static class DependencyInjection
 
 		});
 		return services;
-
 	}
 
 	public static IServiceCollection ConfigureLoggerService(this IServiceCollection services)
 	{
 		services.AddSingleton<ILoggerManager, LoggerManager>();
 		return services;
-
 	}
 
-	public static IServiceCollection ConfigureRepositoryManager(this IServiceCollection services)
+    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+		services.AddAuthentication(config =>
+		{
+			config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+			config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+		})
+			.AddJwtBearer(config =>
+			{
+				config.TokenValidationParameters = new()
+				{
+					ValidIssuer = configuration["JwtSettings:Issuer"],
+					ValidAudience = configuration["JwtSettings:Audience"],
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),
+					ValidateIssuer = true,
+					ValidateAudience = true,
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true
+				};
+			});
+
+		services.AddTransient<IAuthenticationService, AuthenticationService>();
+		return services;
+    }
+
+    public static IServiceCollection ConfigureAuthorization(this IServiceCollection services)
+    {
+        services.AddAuthorization(options =>
+        {
+            var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
+                JwtBearerDefaults.AuthenticationScheme);
+
+            defaultAuthorizationPolicyBuilder =
+                defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
+
+            options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
+        });
+        return services;
+    }
+
+    public static IServiceCollection ConfigureRepositoryManager(this IServiceCollection services)
 	{
 		services.AddScoped<IRepositoryManager, RepositoryManager>();
 		return services;
-
 	}
+
 	public static IServiceCollection ConfigureServiceManager(this IServiceCollection services)
 	{
 		services.AddScoped<IServiceManager, ServiceManager>();
@@ -77,6 +122,21 @@ public static class DependencyInjection
 		});
 		return services;
 	}
+
+    public static IServiceCollection ConfigureJwtOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtOptions>(configuration.GetSection("JwtSettings"));
+        return services;
+    }
+
+    public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
+    {
+		services
+			.AddIdentity<AppUser, IdentityRole>()
+			.AddEntityFrameworkStores<RepositoryContext>();
+
+        return services;
+    }
 
     public static IServiceCollection ConfigureControllersAndFormatters(this IServiceCollection services)
 	{

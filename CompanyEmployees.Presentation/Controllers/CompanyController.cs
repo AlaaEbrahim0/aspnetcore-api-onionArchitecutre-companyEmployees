@@ -1,4 +1,5 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,7 @@ public class CompanyController: ControllerBase
 
     [HttpGet]
 	[HttpHead]
+	[Authorize]
 	public async Task<IActionResult> GetCompaniesAsync([FromQuery] CompanyParameters companyParameters)
 	{
 		var companies = await _serviceManager.CompanyService.GetAllCompaniesAsync(companyParameters ,false);
@@ -80,14 +82,6 @@ public class CompanyController: ControllerBase
 	[ServiceFilter(typeof(ValidationFilterAttribute))]
 	public async Task<IActionResult> UpdateCompanyAsync(int companyId, CompanyForUpdationDto companyToUpdate)
 	{
-		// The validationFilter is a substitue for the below commented code
-
-		//if (companyToUpdate is null)
-		//	return BadRequest("CompanyForUpdationDto is null");
-
-		//if (!ModelState.IsValid)
-		//	return UnprocessableEntity(ModelState);
-
 		await _serviceManager.CompanyService.UpdateCompanyAsync(companyId, companyToUpdate, true);
 		return Ok($"Company with Id: {companyId} has been updated successfully");
 	}
