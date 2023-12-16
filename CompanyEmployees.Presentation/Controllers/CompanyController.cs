@@ -9,8 +9,9 @@ using Shared.RequestFeatures;
 
 namespace CompanyEmployees.Presentation.Controllers;
 
-[Route("api/companies")]
 [ApiController]
+[Route("api/companies")]
+[ResponseCache(CacheProfileName = "120SecondsDuration")]
 public class CompanyController: ControllerBase
 {
 	private readonly IServiceManager _serviceManager;

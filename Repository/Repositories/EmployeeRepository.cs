@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Contracts;
-using Entities;
 using Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Repository.Extensions;
 using System.Linq.Dynamic.Core;
 using Repository.Extensions.Utility;
 using Shared.RequestFeatures;
+using Entities.Models;
 
 namespace Repository.Repositories;
 public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository

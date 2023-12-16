@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Contracts;
-using Entities;
 using Entities.Exceptions;
+using Entities.Models;
 using Moq;
 using Services;
 using Shared.DTOs;

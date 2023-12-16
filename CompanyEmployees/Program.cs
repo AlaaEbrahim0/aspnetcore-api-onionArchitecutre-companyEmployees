@@ -20,6 +20,7 @@ public class Program
 			.ConfigureLoggerService()
 			.ConfigureRepositoryManager()
 			.ConfigureServiceManager()
+			.ConfigureCaching()
 			.AddAutoMapper(typeof(Program))
 			.ConfigureSqlContext(builder.Configuration)
 			.ConfigureControllersAndFormatters()
@@ -30,7 +31,6 @@ public class Program
 		{
 			options.SuppressModelStateInvalidFilter = true;
 		});
-		
 
 		LogManager.Setup(builder =>
 			builder.LoadConfigurationFromFile($@"{Directory.GetCurrentDirectory()}\nlog.config"));
@@ -46,9 +46,6 @@ public class Program
 
 		app.UseHttpsRedirection();
 
-		// enables using static files for the request
-		// If we don’t set a path to the static files directory
-		// It will use a wwwroot folder in our project by default.
 		app.UseStaticFiles();
 		
 		// will help us in deployment
@@ -59,6 +56,8 @@ public class Program
 
 		// Using the cors configuration in the cors middleware
 		app.UseCors("CorsPolicy");
+
+		app.UseResponseCaching();
 
 		app.UseAuthorization();
 

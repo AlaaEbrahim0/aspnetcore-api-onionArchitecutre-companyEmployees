@@ -1,6 +1,8 @@
 ﻿using System.Dynamic;
 using Contracts;
+using Entities.Models;
 using LoggerService;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -56,10 +58,15 @@ public static class DependencyInjection
 	{
 		services.AddScoped<IServiceManager, ServiceManager>();
 		return services;
-
 	}
 
-	public static IServiceCollection ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureCaching(this IServiceCollection services)
+    {
+		services.AddResponseCaching();
+        return services;
+    }
+
+    public static IServiceCollection ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContextPool<RepositoryContext>(options =>
 		{
@@ -69,10 +76,9 @@ public static class DependencyInjection
 			});
 		});
 		return services;
-
 	}
 
-	public static IServiceCollection ConfigureControllersAndFormatters(this IServiceCollection services)
+    public static IServiceCollection ConfigureControllersAndFormatters(this IServiceCollection services)
 	{
 		
 		services
@@ -87,6 +93,8 @@ public static class DependencyInjection
 			config.ReturnHttpNotAcceptable = true;
 
 			config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+
+			config.CacheProfiles.Add("120SecondsDuration", new CacheProfile() { Duration = 120 });
 			
 				
 		})

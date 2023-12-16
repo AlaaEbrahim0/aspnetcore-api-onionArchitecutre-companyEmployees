@@ -1,8 +1,8 @@
 ﻿using System.Reflection.Metadata;
 using AutoMapper;
 using Contracts;
-using Entities;
 using Entities.Exceptions;
+using Entities.Models;
 using Service.Contracts;
 using Shared.DTOs;
 using Shared.RequestFeatures;

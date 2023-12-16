@@ -1,5 +1,5 @@
 ﻿using System.Dynamic;
-using Entities;
+using Entities.Models;
 using Shared.DTOs;
 using Shared.RequestFeatures;
 

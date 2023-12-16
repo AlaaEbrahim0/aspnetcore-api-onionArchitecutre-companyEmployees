@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.SymbolStore;
-using Entities;
+using Entities.Models;
 using Shared.DTOs;
 using Shared.RequestFeatures;
 

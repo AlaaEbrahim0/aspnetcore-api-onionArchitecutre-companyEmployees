@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Entities;
+using Entities.Models;
 using Shared.DTOs;
 
 namespace CompanyEmployees;
